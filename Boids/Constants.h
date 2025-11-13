@@ -13,3 +13,5 @@ constexpr double COHESION_DISTANCE = 0.2;
 
 constexpr double NEIGHBOR_DISTANCE = 0.3;
 constexpr double MAX_SPEED = 0.03;
+
+constexpr double DELTA_T = 0.02;

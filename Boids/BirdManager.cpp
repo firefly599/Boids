@@ -17,19 +17,21 @@ void BirdManager::InitializeBirds(int numberOfBirds) {
 		Bird new_bird = Bird(i);
 		new_bird.position = GetRandomFloat3();
 		new_bird.acceleration = Array3Divide(GetRandomFloat3(), 10);
-		birds[i] = Bird(i);
+		birds[i] = new_bird;
 
 		if (i == 0) {
 			cout << new_bird.position[0] << ", " << new_bird.position[1] << ", " << new_bird.position[2] << endl;
 		}
 	}
 }
-void BirdManager::UpdateBirds(float deltaTime) {
+void BirdManager::UpdateCycle() {
 	CalculateForces();
-
+	UpdateBirds();
 	return;
 }
 
+
+#pragma region ForceCalculations
 void BirdManager::CalculateForces() {
 	for (Bird& this_bird : birds) {
 		this_bird.ResetForces();
@@ -38,7 +40,7 @@ void BirdManager::CalculateForces() {
 		std::array<double, 3> tmp_alignment = { 0.0, 0.0, 0.0 };
 		std::array<double, 3> tmp_cohesion = { 0.0, 0.0, 0.0 };
 
-		for (Bird other_bird : birds) {
+		for (const auto& other_bird : birds) {
 			if (this_bird.id != other_bird.id) {
 				tmp_separation = Array3Addition(CalculateSeparation(this_bird, other_bird), tmp_separation);
 				tmp_alignment = Array3Addition(CalculateAlignment(this_bird, other_bird), tmp_alignment);
@@ -84,14 +86,35 @@ std::array<double, 3> BirdManager::CalculateCohesion(Bird this_bird, Bird other_
 	if (distanceSquared < COHESION_DISTANCE) {
 		this_bird.cohesionCounter++;
 		return (other_bird.position);
-		
+
 	}
 	return std::array<double, 3> {0.0, 0.0, 0.0};
 }
+
+#pragma endregion
+
+#pragma region UpdateSection
+void BirdManager::UpdateBirds() {
+	for (Bird& bird : birds) {
+		bird.UpdateTotalForces();
+		bird.UpdateAcceleration();
+		bird.UpdateVelocity();
+		bird.UpdatePosition();
+	}
+}
+#pragma endregion
+
 
 const void BirdManager::print_data() {
 	for (int i = 0; i < NUMBER_OF_BOIDS; i++) {
 		printf("Bird ID: %d\n", birds[i].id);
 	}
+	return;
+}
+
+const void BirdManager::print_data_single() {
+	Bird b = birds[0];
+	cout << "Sep " << b.separation[0] << b.separation[1] << b.separation[2] << endl;
+
 	return;
 }

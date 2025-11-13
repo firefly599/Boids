@@ -20,8 +20,8 @@ int main()
 	bird_manager.InitializeBirds(NUMBER_OF_BOIDS);
 	while (true) {
 		// Update and render boids
-		//bird_manager.print_data();
-		//cout<< "-----" << simulation_cycle++ << endl;
+		bird_manager.UpdateCycle();
+		bird_manager.print_data_single();
 	}
 	return 0;
 }

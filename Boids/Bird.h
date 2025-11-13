@@ -1,5 +1,7 @@
 #pragma once
 #include <array>
+#include "Constants.h"
+#include "Utils.h"
 class Bird
 {
 public:
@@ -8,6 +10,7 @@ public:
 	~Bird() = default;
 
 	int id;
+	double mass = 100.0;
 
 	std::array<double, 3> position = {};
 	std::array<double, 3> velocity = {};
@@ -17,6 +20,8 @@ public:
 	std::array<double, 3> alignment = {};
 	std::array<double, 3> cohesion = {};
 
+	std::array<double, 3> totalForce = {}; 
+
 	int alignmentCounter = 0;
 	int cohesionCounter = 0;
 
@@ -25,5 +30,10 @@ public:
 		alignment = { 0.0, 0.0, 0.0 };
 		cohesion = { 0.0, 0.0, 0.0 };
 	}
+
+	void UpdateTotalForces();
+	void UpdateAcceleration();
+	void UpdateVelocity();
+	void UpdatePosition();
 };
 

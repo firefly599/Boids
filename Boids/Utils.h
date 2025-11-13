@@ -29,3 +29,7 @@ inline std::array<double, 3> Array3Subtract(const std::array<double, 3>& a, cons
 inline std::array<double, 3> Array3Addition(const std::array<double, 3>& a, const std::array<double, 3>& b) {
 	return { a[0] + b[0], a[1] + b[1], a[2] + b[2] };
 }
+
+inline std::array<double, 3> Array3Multiply(const std::array<double, 3>& a, double scalar) {
+	return { a[0] * scalar, a[1] * scalar, a[2] * scalar };
+}
