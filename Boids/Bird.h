@@ -17,8 +17,13 @@ public:
 	std::array<double, 3> alignment = {};
 	std::array<double, 3> cohesion = {};
 
-	
+	int alignmentCounter = 0;
+	int cohesionCounter = 0;
 
-
+	inline void ResetForces() {
+		separation = { 0.0, 0.0, 0.0 };
+		alignment = { 0.0, 0.0, 0.0 };
+		cohesion = { 0.0, 0.0, 0.0 };
+	}
 };
 

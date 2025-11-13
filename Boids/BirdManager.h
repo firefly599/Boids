@@ -15,9 +15,8 @@ public:
 
 private:
 	void CalculateForces();
-	std::array<double, 3> CalculateSeparation(Bird this_bird);
-	std::array<double, 3> CalculateAlignment(Bird this_bird);
-	std::array<double, 3> CalculateCohesion(Bird this_bird);
-	
+	std::array<double, 3> CalculateSeparation(Bird this_bird, Bird other_bird);
+	std::array<double, 3> CalculateAlignment(Bird this_bird, Bird other_bird);
+	std::array<double, 3> CalculateCohesion(Bird this_bird, Bird other_bird);
 };
 

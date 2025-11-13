@@ -32,74 +32,62 @@ void BirdManager::UpdateBirds(float deltaTime) {
 
 void BirdManager::CalculateForces() {
 	for (Bird& this_bird : birds) {
-		this_bird.separation = CalculateSeparation(this_bird);
-		CalculateAlignment(this_bird);
-		CalculateCohesion(this_bird);
-	}
-}
+		this_bird.ResetForces();
 
-std::array<double, 3> BirdManager::CalculateSeparation(Bird this_bird) {
-	std::array<double, 3> tmp_separation = { 0.0, 0.0, 0.0 };
-	for (Bird other_bird : birds) {
-		if (this_bird.id != other_bird.id) {
-			std::array<double, 3> diff = Array3Subtract(this_bird.position, other_bird.position);
-			double distanceSquared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
+		std::array<double, 3> tmp_separation = { 0.0, 0.0, 0.0 };
+		std::array<double, 3> tmp_alignment = { 0.0, 0.0, 0.0 };
+		std::array<double, 3> tmp_cohesion = { 0.0, 0.0, 0.0 };
 
-			if (distanceSquared < SEPARATION_DISTANCE && distanceSquared > 0.0) {
-				tmp_separation[0] += diff[0];
-				tmp_separation[1] += diff[0];
-				tmp_separation[2] += diff[0];
+		for (Bird other_bird : birds) {
+			if (this_bird.id != other_bird.id) {
+				tmp_separation = Array3Addition(CalculateSeparation(this_bird, other_bird), tmp_separation);
+				tmp_alignment = Array3Addition(CalculateAlignment(this_bird, other_bird), tmp_alignment);
+				tmp_cohesion = Array3Addition(CalculateCohesion(this_bird, other_bird), tmp_cohesion);
 			}
 		}
-	}
-	return tmp_separation;
-}
+		this_bird.separation = tmp_separation;
 
-std::array<double, 3> BirdManager::CalculateAlignment(Bird this_bird) {
-	std::array<double, 3> tmp_alignment = { 0.0, 0.0, 0.0 };
-	int counter = 0;
-	
-	for (Bird other_bird : birds) {
-		if (this_bird.id != other_bird.id) {
-			double distanceSquared = GetDistance(this_bird.position, other_bird.position);
+		if (this_bird.alignmentCounter > 0) {
+			this_bird.alignment = Array3Divide(tmp_alignment, static_cast<double>(this_bird.alignmentCounter));
+		}
 
-			if (distanceSquared < SEPARATION_DISTANCE) {
-				tmp_alignment[0] += other_bird.velocity[0];
-				tmp_alignment[1] += other_bird.velocity[1];
-				tmp_alignment[2] += other_bird.velocity[2];
-				counter++;
-			}
+		if (this_bird.cohesionCounter > 0) {
+			std::array<double, 3> average_position = Array3Divide(tmp_cohesion, static_cast<double>(this_bird.cohesionCounter));
+			this_bird.cohesion = Array3Subtract(average_position, this_bird.position);
 		}
 	}
-	if (counter > 0) {
-		tmp_alignment = Array3Divide(tmp_alignment, static_cast<double>(counter));
-		tmp_alignment = Array3Subtract(tmp_alignment, this_bird.velocity);
-	}
-
-	return tmp_alignment;
 }
 
-std::array<double, 3> BirdManager::CalculateCohesion(Bird this_bird) {
-	std::array<double, 3> tmp_cohesion = { 0.0, 0.0, 0.0 };
-	int counter = 0;
+std::array<double, 3> BirdManager::CalculateSeparation(Bird this_bird, Bird other_bird) {
+	std::array<double, 3> diff = Array3Subtract(this_bird.position, other_bird.position);
+	double distanceSquared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
 
-	for (Bird other_bird : birds) {
-		if (this_bird.id != other_bird.id) {
-			double distanceSquared = GetDistance(this_bird.position, other_bird.position);
-			if (distanceSquared < COHESION_DISTANCE) {
-				tmp_cohesion = Array3Addition(tmp_cohesion, other_bird.position);
-				counter++;
-			}
-		}
+	if (distanceSquared < SEPARATION_DISTANCE && distanceSquared > 0.0) {
+		return diff;
 	}
 
-	if (counter > 0) {
-		tmp_cohesion = Array3Divide(tmp_cohesion, static_cast<double>(counter));
-		tmp_cohesion = Array3Subtract(tmp_cohesion, this_bird.position);
-	}
-	return tmp_cohesion;
+	return std::array<double, 3>{ 0.0, 0.0, 0.0 };
 }
 
+std::array<double, 3> BirdManager::CalculateAlignment(Bird this_bird, Bird other_bird) {
+	double distanceSquared = GetDistance(this_bird.position, other_bird.position);
+
+	if (distanceSquared < ALIGNMENT_DISTANCE) {
+		this_bird.alignmentCounter++;
+		return other_bird.velocity;
+	}
+	return std::array<double, 3> { 0.0, 0.0, 0.0 };
+}
+
+std::array<double, 3> BirdManager::CalculateCohesion(Bird this_bird, Bird other_bird) {
+	double distanceSquared = GetDistance(this_bird.position, other_bird.position);
+	if (distanceSquared < COHESION_DISTANCE) {
+		this_bird.cohesionCounter++;
+		return (other_bird.position);
+		
+	}
+	return std::array<double, 3> {0.0, 0.0, 0.0};
+}
 
 const void BirdManager::print_data() {
 	for (int i = 0; i < NUMBER_OF_BOIDS; i++) {
