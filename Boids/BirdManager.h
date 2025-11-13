@@ -14,7 +14,10 @@ public:
 	const void print_data();
 
 private:
-	
+	void CalculateForces();
+	void CalculateSeparation(Bird this_bird);
+	void CalculateAlignment(Bird this_bird);
+	void CalculateCohesion(Bird this_bird);
 	
 };
 
