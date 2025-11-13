@@ -32,39 +32,72 @@ void BirdManager::UpdateBirds(float deltaTime) {
 
 void BirdManager::CalculateForces() {
 	for (Bird& this_bird : birds) {
-		CalculateSeparation(this_bird);
+		this_bird.separation = CalculateSeparation(this_bird);
 		CalculateAlignment(this_bird);
 		CalculateCohesion(this_bird);
 	}
 }
 
-void BirdManager::CalculateSeparation(Bird this_bird) {
+std::array<double, 3> BirdManager::CalculateSeparation(Bird this_bird) {
 	std::array<double, 3> tmp_separation = { 0.0, 0.0, 0.0 };
 	for (Bird other_bird : birds) {
 		if (this_bird.id != other_bird.id) {
-			double dx = this_bird.position[0] - other_bird.position[0];
-			double dy = this_bird.position[1] - other_bird.position[1];
-			double dz = this_bird.position[2] - other_bird.position[2];
-			double distanceSquared = dx * dx + dy * dy + dz * dz;
+			std::array<double, 3> diff = Array3Subtract(this_bird.position, other_bird.position);
+			double distanceSquared = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
 
-			if (distanceSquared < SEPARATION_DISTANCE * SEPARATION_DISTANCE && distanceSquared > 0.0) {
-				tmp_separation[0] += dx;
-				tmp_separation[1] += dy;
-				tmp_separation[2] += dz;
+			if (distanceSquared < SEPARATION_DISTANCE && distanceSquared > 0.0) {
+				tmp_separation[0] += diff[0];
+				tmp_separation[1] += diff[0];
+				tmp_separation[2] += diff[0];
 			}
 		}
 	}
-	return;
+	return tmp_separation;
 }
 
-void BirdManager::CalculateAlignment(Bird this_bird) {
-	// Placeholder for alignment logic
-	return;
+std::array<double, 3> BirdManager::CalculateAlignment(Bird this_bird) {
+	std::array<double, 3> tmp_alignment = { 0.0, 0.0, 0.0 };
+	int counter = 0;
+	
+	for (Bird other_bird : birds) {
+		if (this_bird.id != other_bird.id) {
+			double distanceSquared = GetDistance(this_bird.position, other_bird.position);
+
+			if (distanceSquared < SEPARATION_DISTANCE) {
+				tmp_alignment[0] += other_bird.velocity[0];
+				tmp_alignment[1] += other_bird.velocity[1];
+				tmp_alignment[2] += other_bird.velocity[2];
+				counter++;
+			}
+		}
+	}
+	if (counter > 0) {
+		tmp_alignment = Array3Divide(tmp_alignment, static_cast<double>(counter));
+		tmp_alignment = Array3Subtract(tmp_alignment, this_bird.velocity);
+	}
+
+	return tmp_alignment;
 }
 
-void BirdManager::CalculateCohesion(Bird this_bird) {
-	// Placeholder for cohesion logic
-	return;
+std::array<double, 3> BirdManager::CalculateCohesion(Bird this_bird) {
+	std::array<double, 3> tmp_cohesion = { 0.0, 0.0, 0.0 };
+	int counter = 0;
+
+	for (Bird other_bird : birds) {
+		if (this_bird.id != other_bird.id) {
+			double distanceSquared = GetDistance(this_bird.position, other_bird.position);
+			if (distanceSquared < COHESION_DISTANCE) {
+				tmp_cohesion = Array3Addition(tmp_cohesion, other_bird.position);
+				counter++;
+			}
+		}
+	}
+
+	if (counter > 0) {
+		tmp_cohesion = Array3Divide(tmp_cohesion, static_cast<double>(counter));
+		tmp_cohesion = Array3Subtract(tmp_cohesion, this_bird.position);
+	}
+	return tmp_cohesion;
 }
 
 
