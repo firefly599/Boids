@@ -21,7 +21,12 @@ int main()
 	while (true) {
 		// Update and render boids
 		bird_manager.UpdateCycle();
-		bird_manager.print_data_single();
+		simulation_cycle++;
+
+		if (simulation_cycle % 100 == 0) {
+			cout << "Cycle: " << simulation_cycle << endl;
+			bird_manager.print_positions();
+		}
 	}
 	return 0;
 }

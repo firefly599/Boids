@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "Utils.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -27,6 +28,8 @@ void BirdManager::InitializeBirds(int numberOfBirds) {
 void BirdManager::UpdateCycle() {
 	CalculateForces();
 	UpdateBirds();
+
+	check_out_of_bounds();
 	return;
 }
 
@@ -104,6 +107,7 @@ void BirdManager::UpdateBirds() {
 }
 #pragma endregion
 
+#pragma region PrintFunctions
 
 const void BirdManager::print_data() {
 	for (int i = 0; i < NUMBER_OF_BOIDS; i++) {
@@ -118,3 +122,42 @@ const void BirdManager::print_data_single() {
 
 	return;
 }
+
+const void BirdManager::print_positions() {
+	int counter;
+	for (int x = 0; x < 10; x++) {
+		string line = "";
+		for (int y = 0; y < 10; y++) {
+			counter = 0;
+			for (Bird b : birds) {
+				int xTenths = static_cast<int>(b.position[0] * 10);
+				int yTenths = static_cast<int>(b.position[1] * 10);
+
+				if (xTenths == x && yTenths == y) {
+					counter++;
+				}
+			}
+			line += to_string(counter) + " ";
+		}
+		cout << line << endl;
+	}
+
+	return;
+}
+
+#pragma endregion
+
+
+#pragma region OtherFunctions()
+const void BirdManager::check_out_of_bounds() {
+	for (Bird b : birds) {
+		for (int i = 0; i < 3; ++i) {
+			if (b.position[i] < 0.0 || b.position[i] >= WORLD_SIZE) {
+				cout << "Bird ID " << b.id << " out of bounds on axis " << i << " with position " << b.position[i] << endl;
+			}
+		}
+	}
+	return;
+}
+
+#pragma endregion

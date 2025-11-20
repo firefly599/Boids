@@ -13,9 +13,22 @@ void Bird::UpdateAcceleration() {
 }
 
 void Bird::UpdateVelocity() {
+	// Velocity update: v(x) += a(x) * Delta_t
 	velocity = Array3Addition(Array3Multiply(acceleration, DELTA_T), velocity);
 }
 
 void Bird::UpdatePosition() {
+	// Position update: p(x) += velocity(x) * Delta_t
 	position = Array3Addition(Array3Multiply(velocity, DELTA_T), position);
+	wrapPosition();
+}
+
+void Bird::wrapPosition() {
+	for (int i = 0; i < 3; ++i) {
+		if (position[i] < 0.0) {
+			position[i] += WORLD_SIZE;
+		} else if (position[i] >= WORLD_SIZE) {
+			position[i] -= WORLD_SIZE;
+		}
+	}
 }

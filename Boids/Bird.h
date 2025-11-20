@@ -35,5 +35,7 @@ public:
 	void UpdateAcceleration();
 	void UpdateVelocity();
 	void UpdatePosition();
+
+	void wrapPosition();
 };
 

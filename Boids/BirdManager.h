@@ -11,8 +11,12 @@ public:
 
 	void InitializeBirds(int NUMBER_OF_BOIDS);
 	void UpdateCycle();
+
 	const void print_data();
 	const void print_data_single();
+	const void print_positions();
+
+	const void check_out_of_bounds();
 
 private:
 	void CalculateForces();
